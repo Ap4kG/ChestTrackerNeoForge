@@ -128,6 +128,12 @@ public class ChestTrackerConfig {
         public boolean shulkerBoxTooltipIntegration = true;
         @SerialEntry
         public boolean wthitIntegration = true;
+        @SerialEntry
+        public boolean jadeIntegration = true;
+        @SerialEntry
+        public boolean jeiIntegration = true;
+        @SerialEntry
+        public boolean xaeroIntegration = true;
 
         @SerialEntry
         public Litematica litematica = new Litematica();

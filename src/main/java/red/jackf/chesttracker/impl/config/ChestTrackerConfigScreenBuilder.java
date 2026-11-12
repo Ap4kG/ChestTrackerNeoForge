@@ -491,6 +491,48 @@ public class ChestTrackerConfigScreenBuilder {
                                         b -> instance.instance().compatibility.wthitIntegration = b
                                 )
                                 .build())
+                .option(Option.<Boolean>createBuilder()
+                                .name(translatable("chesttracker.config.compatibility.jade"))
+                                .description(OptionDescription.of(
+                                        translatable("chesttracker.config.compatibility.jade.description")
+                                ))
+                                .controller(opt -> BooleanControllerBuilder.create(opt)
+                                        .onOffFormatter()
+                                        .coloured(true))
+                                .binding(
+                                        instance.defaults().compatibility.jadeIntegration,
+                                        () -> instance.instance().compatibility.jadeIntegration,
+                                        b -> instance.instance().compatibility.jadeIntegration = b
+                                )
+                                .build())
+                .option(Option.<Boolean>createBuilder()
+                                .name(translatable("chesttracker.config.compatibility.jei"))
+                                .description(OptionDescription.of(
+                                        translatable("chesttracker.config.compatibility.jei.description")
+                                ))
+                                .controller(opt -> BooleanControllerBuilder.create(opt)
+                                        .onOffFormatter()
+                                        .coloured(true))
+                                .binding(
+                                        instance.defaults().compatibility.jeiIntegration,
+                                        () -> instance.instance().compatibility.jeiIntegration,
+                                        b -> instance.instance().compatibility.jeiIntegration = b
+                                )
+                                .build())
+                .option(Option.<Boolean>createBuilder()
+                                .name(translatable("chesttracker.config.compatibility.xaero"))
+                                .description(OptionDescription.of(
+                                        translatable("chesttracker.config.compatibility.xaero.description")
+                                ))
+                                .controller(opt -> BooleanControllerBuilder.create(opt)
+                                        .onOffFormatter()
+                                        .coloured(true))
+                                .binding(
+                                        instance.defaults().compatibility.xaeroIntegration,
+                                        () -> instance.instance().compatibility.xaeroIntegration,
+                                        b -> instance.instance().compatibility.xaeroIntegration = b
+                                )
+                                .build())
                 .group(OptionGroup.createBuilder()
                         .name(translatable("chesttracker.config.compatibility.litematica"))
                         .option(Option.<Boolean>createBuilder()
