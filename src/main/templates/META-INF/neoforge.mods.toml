@@ -1,13 +1,13 @@
 modLoader="javafml"
 loaderVersion="[1,)"
 license="${mod_license}"
-issueTrackerURL="https://github.com/ponuing/ChestTracker/issues"
+issueTrackerURL="https://github.com/Ap4kG/ChestTrackerNeoForge/issues"
 
 [[mods]]
 modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
-displayURL="https://github.com/ponuing/ChestTracker"
+displayURL="https://github.com/Ap4kG/ChestTrackerNeoForge"
 iconFile="assets/chesttracker/icon.png"
 authors="JackFred; ponuing; unofficial NeoForge port"
 description='''Client-side item storage and searching for Minecraft 26.3. Unofficial NeoForge port.'''
