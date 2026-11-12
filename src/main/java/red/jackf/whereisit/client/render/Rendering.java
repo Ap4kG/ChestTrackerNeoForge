@@ -19,6 +19,8 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 import net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joml.Matrix4f;
 import red.jackf.chesttracker.impl.ChestTracker;
 import red.jackf.whereisit.api.SearchRequest;
@@ -32,6 +34,7 @@ import java.util.Optional;
 
 /** Search result state and world highlights used by Chest Tracker. */
 public final class Rendering {
+    private static final Logger LOGGER = LogManager.getLogger("ChestTracker/Rendering");
     private static final RenderPipeline HIGHLIGHT_FILL_PIPELINE = RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
             .withLocation(ChestTracker.id("pipeline/highlight_fill_see_through"))
             .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
@@ -62,6 +65,7 @@ public final class Rendering {
     private static final Map<BlockPos, SearchResult> NAMED_RESULTS = new HashMap<>();
     private static int ticksSinceSearch = HIGHLIGHT_LIFETIME_TICKS + 1;
     private static boolean initialized;
+    private static boolean irisMapped;
 
     private Rendering() {}
 
@@ -74,6 +78,27 @@ public final class Rendering {
     public static void registerPipelines(RegisterRenderPipelinesEvent event) {
         event.registerPipeline(HIGHLIGHT_FILL_PIPELINE);
         event.registerPipeline(HIGHLIGHT_LINE_PIPELINE);
+    }
+
+    /**
+     * Iris only draws pipelines it has a shader program mapping for; everything else is silently skipped
+     * ("no Iris shader mapping for pipeline ..."). Copy the mappings of the closest vanilla pipelines onto ours
+     * so the highlights keep rendering while a shader pack is active. Done lazily on the render thread, since
+     * touching Iris classes during mod loading is not safe.
+     */
+    private static void ensureIrisMappings() {
+        if (irisMapped) return;
+        irisMapped = true;
+        try {
+            Class<?> irisPipelines = Class.forName("net.irisshaders.iris.pipeline.IrisPipelines");
+            var copyPipeline = irisPipelines.getMethod("copyPipeline", RenderPipeline.class, RenderPipeline.class);
+            copyPipeline.invoke(null, RenderPipelines.DEBUG_FILLED_BOX, HIGHLIGHT_FILL_PIPELINE);
+            copyPipeline.invoke(null, RenderPipelines.LINES_TRANSLUCENT, HIGHLIGHT_LINE_PIPELINE);
+        } catch (ClassNotFoundException ignored) {
+            // Iris is not installed.
+        } catch (ReflectiveOperationException e) {
+            LOGGER.warn("Failed to give the highlight pipelines an Iris shader mapping", e);
+        }
     }
 
     public static void addResults(Collection<SearchResult> results) {
@@ -115,6 +140,7 @@ public final class Rendering {
     public static void onSubmitCustomGeometry(SubmitCustomGeometryEvent event) {
         if (RESULTS.isEmpty() || ticksSinceSearch > HIGHLIGHT_LIFETIME_TICKS) return;
 
+        ensureIrisMappings();
         HighlightAlpha alpha = getHighlightAlpha();
         Vec3 cameraPos = event.getLevelRenderState().cameraRenderState.pos;
         PoseStack poseStack = event.getPoseStack();
