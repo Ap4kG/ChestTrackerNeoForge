@@ -31,7 +31,7 @@ public final class WhereIsItClient {
             Rendering.addResults(newResults);
         });
         recieveResults(results);
-        if (!results.isEmpty() && Minecraft.getInstance().player != null && Minecraft.getInstance().screen != null) {
+        if (!results.isEmpty() && Minecraft.getInstance().player != null && Minecraft.getInstance().gui.screen() != null) {
             closedScreenThisSearch = true;
             Minecraft.getInstance().player.closeContainer();
         }
@@ -53,7 +53,7 @@ public final class WhereIsItClient {
         recieveResults(results);
 
         Minecraft client = Minecraft.getInstance();
-        if (client.player != null && client.screen != null) {
+        if (client.player != null && client.gui.screen() != null) {
             closedScreenThisSearch = true;
             client.player.closeContainer();
         }

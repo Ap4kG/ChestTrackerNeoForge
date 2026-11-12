@@ -25,7 +25,7 @@ public final class ClientEventHandler {
             ShareEnderChestIntegration.setup();
         }
 
-        if (client.screen == null && client.getOverlay() == null) {
+        if (client.gui.screen() == null && client.gui.overlay() == null) {
             while (ChestTracker.OPEN_GUI != null && ChestTracker.OPEN_GUI.consumeClick()) {
                 ChestTracker.openInGame(client, null);
             }

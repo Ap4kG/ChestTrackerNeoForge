@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 import red.jackf.chesttracker.impl.util.GuiUtil;
 
 public class CustomEditBox extends EditBox {
@@ -29,7 +29,7 @@ public class CustomEditBox extends EditBox {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean consumed) {
-        if (isMouseOver(event.x(), event.y()) && event.button() == GLFW.GLFW_MOUSE_BUTTON_2) {
+        if (isMouseOver(event.x(), event.y()) && event.button() == InputConstants.MOUSE_BUTTON_RIGHT) {
             this.setValue("");
             return true;
         }

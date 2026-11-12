@@ -1,13 +1,13 @@
-# Chest Tracker — NeoForge 26.1.2
+# Chest Tracker — NeoForge 26.3
 
-Unofficial NeoForge port of [Chest Tracker](https://github.com/ponuing/ChestTracker) for Minecraft 26.1.2.
+Unofficial NeoForge port of [Chest Tracker](https://github.com/ponuing/ChestTracker) for Minecraft 26.3.
 
 ## Requirements
 
-- Minecraft 26.1.2
-- NeoForge 26.1.2.95 or newer
+- Minecraft 26.3
+- NeoForge 26.3.0.102 or newer
 - Java 25
-- [YetAnotherConfigLib (YACL) 3.9.1+26.1 for NeoForge](https://modrinth.com/mod/yacl)
+- [YetAnotherConfigLib (YACL) 3.9.7+26.3 for NeoForge](https://modrinth.com/mod/yacl)
 
 ## Build
 
@@ -23,7 +23,13 @@ Core container memory, storage, search, inventory controls, configuration and wo
 
 Press `T` while hovering an item in any inventory to find matching saved containers. The inventory closes only when a match exists. This key can be changed in Minecraft's Controls settings.
 
-This branch also contains NeoForge lifecycle fixes for item components used by the Shared Ender Chest integration.
+## 26.3 port notes
+
+- Rendering migrated to the RenderPearl/Blaze3D split (`com.mojang.renderpearl.*`), the submit-node world renderer and `GuiGraphicsExtractor`.
+- Screens are now reached through `Minecraft#gui` (`gui.screen()`, `gui.setScreen(...)`), the tab list through `gui.hud`, and toasts through `gui.toastManager()`.
+- Input ids come from SDL instead of GLFW (`InputConstants.Type.KEYBOARD`, SDL mouse button ids).
+- Dye-coloured items moved into `ColorCollection` (`Items.BED.pick(DyeColor.RED)`).
+- World labels stay disabled, so the old `LevelRenderer` mixin was dropped. Highlights are submitted through NeoForge's `SubmitCustomGeometryEvent`; the extra Iris-only immediate-mode pass was removed because `MultiBufferSource` no longer exists.
 
 ## Credits and license
 

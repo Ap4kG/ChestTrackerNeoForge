@@ -4,7 +4,7 @@
   "package": "red.jackf.jackfredlib.client.mixins.gps",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "GuiAccessor",
+    "HudAccessor",
     "MinecraftServerAccessor",
     "PlayerTabOverlayAccessor",
     "RealmsConnectMixin"

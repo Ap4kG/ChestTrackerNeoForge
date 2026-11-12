@@ -226,7 +226,7 @@ public class EditMemoryBankScreen extends BaseUtilScreen {
     }
 
     private void openEditMemoryKeys(Button ignored) {
-        Minecraft.getInstance().setScreen(new EditMemoryKeysScreen(this, memoryBank));
+        Minecraft.getInstance().gui.setScreen(new EditMemoryKeysScreen(this, memoryBank));
     }
 
     private void markSettingsCustom() {
@@ -784,7 +784,7 @@ public class EditMemoryBankScreen extends BaseUtilScreen {
 
     @Override
     public void onClose() {
-        Minecraft.getInstance().setScreen(parent);
+        Minecraft.getInstance().gui.setScreen(parent);
     }
 
     @FunctionalInterface

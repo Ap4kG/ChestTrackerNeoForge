@@ -61,8 +61,8 @@ public class ChestTracker {
     }
 
     public static void registerKeyMappings(RegisterKeyMappingsEvent event) {
-        OPEN_GUI = new KeyMapping("key.chesttracker.open_gui", InputConstants.Type.KEYSYM, InputConstants.KEY_GRAVE, CHESTTRACKER_CATEGORY);
-        SEARCH_HOVERED_ITEM = new KeyMapping("key.chesttracker.search_hovered_item", InputConstants.Type.KEYSYM, InputConstants.KEY_T, CHESTTRACKER_CATEGORY);
+        OPEN_GUI = new KeyMapping("key.chesttracker.open_gui", InputConstants.Type.KEYBOARD, InputConstants.KEY_GRAVE, CHESTTRACKER_CATEGORY);
+        SEARCH_HOVERED_ITEM = new KeyMapping("key.chesttracker.search_hovered_item", InputConstants.Type.KEYBOARD, InputConstants.KEY_T, CHESTTRACKER_CATEGORY);
         event.register(OPEN_GUI);
         event.register(SEARCH_HOVERED_ITEM);
     }
@@ -101,7 +101,7 @@ public class ChestTracker {
     }
 
     public static void openInGame(Minecraft client, @Nullable Screen parent) {
-        client.setScreen(new ChestTrackerScreen(parent));
+        client.gui.setScreen(new ChestTrackerScreen(parent));
     }
 
     public static void skipProviderForNextGuiClose() {

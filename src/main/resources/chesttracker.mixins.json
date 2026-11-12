@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "red.jackf.chesttracker.mixins",
-  "compatibilityLevel": "JAVA_17",
+  "compatibilityLevel": "JAVA_21",
   "plugin": "red.jackf.chesttracker.impl.mixinplugin.ChestTrackerMixinPlugin",
   "client": [
     "AbstractContainerScreenMixin",
@@ -13,8 +13,7 @@
     "ClientPacketListenerMixin",
     "EditBoxAccessor",
     "ScreenMixin",
-    "datafix.V1460Mixin",
-    "LevelRendererMixin"
+    "datafix.V1460Mixin"
   ],
   "injectors": {
     "defaultRequire": 1

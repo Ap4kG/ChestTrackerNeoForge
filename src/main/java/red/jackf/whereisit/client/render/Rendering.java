@@ -1,10 +1,9 @@
 package red.jackf.whereisit.client.render;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.LayeringTransform;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
@@ -16,7 +15,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import org.joml.Matrix4f;
@@ -29,7 +27,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.lang.reflect.Method;
 
 /** Search result state and world highlights used by Chest Tracker. */
 public final class Rendering {
@@ -61,9 +58,6 @@ public final class Rendering {
     private static final Map<BlockPos, SearchResult> NAMED_RESULTS = new HashMap<>();
     private static int ticksSinceSearch = HIGHLIGHT_LIFETIME_TICKS + 1;
     private static boolean initialized;
-    private static boolean irisApiChecked;
-    private static Method irisGetInstance;
-    private static Method irisShaderPackInUse;
 
     private Rendering() {}
 
@@ -115,7 +109,7 @@ public final class Rendering {
 
     @SubscribeEvent
     public static void onSubmitCustomGeometry(SubmitCustomGeometryEvent event) {
-        if (RESULTS.isEmpty() || ticksSinceSearch > HIGHLIGHT_LIFETIME_TICKS || isIrisShaderPackInUse()) return;
+        if (RESULTS.isEmpty() || ticksSinceSearch > HIGHLIGHT_LIFETIME_TICKS) return;
 
         HighlightAlpha alpha = getHighlightAlpha();
         Vec3 cameraPos = event.getLevelRenderState().cameraRenderState.pos;
@@ -129,63 +123,6 @@ public final class Rendering {
         }
     }
 
-    /**
-     * Iris performs the shader pack's final composite after normal submitted world geometry. Render the same 3D boxes
-     * once more after the level and shader pipeline have finished so Complementary and other packs cannot cover them.
-     * A fresh immediate buffer is required here; buffers from the earlier level stages have already been closed.
-     */
-    @SubscribeEvent
-    public static void onRenderAfterShaders(RenderLevelStageEvent.AfterLevel event) {
-        if (RESULTS.isEmpty() || ticksSinceSearch > HIGHLIGHT_LIFETIME_TICKS || !isIrisShaderPackInUse()) return;
-
-        Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.level == null) return;
-
-        HighlightAlpha alpha = getHighlightAlpha();
-        Vec3 cameraPos = event.getLevelRenderState().cameraRenderState.pos;
-        PoseStack poseStack = new PoseStack();
-        poseStack.mulPose(new Matrix4f(event.getModelViewMatrix()));
-        MultiBufferSource.BufferSource buffers = minecraft.renderBuffers().bufferSource();
-
-        VertexConsumer fillConsumer = buffers.getBuffer(HIGHLIGHT_FILL);
-        for (SearchResult result : RESULTS.values()) {
-            emitImmediateBox(poseStack, cameraPos, result.pos(), fillConsumer, null, alpha.fill(), alpha.line());
-            for (BlockPos otherPos : result.otherPositions()) {
-                emitImmediateBox(poseStack, cameraPos, otherPos, fillConsumer, null, alpha.fill(), alpha.line());
-            }
-        }
-        buffers.endBatch(HIGHLIGHT_FILL);
-
-        VertexConsumer lineConsumer = buffers.getBuffer(HIGHLIGHT_LINES);
-        for (SearchResult result : RESULTS.values()) {
-            emitImmediateBox(poseStack, cameraPos, result.pos(), null, lineConsumer, alpha.fill(), alpha.line());
-            for (BlockPos otherPos : result.otherPositions()) {
-                emitImmediateBox(poseStack, cameraPos, otherPos, null, lineConsumer, alpha.fill(), alpha.line());
-            }
-        }
-        buffers.endBatch(HIGHLIGHT_LINES);
-    }
-
-    private static boolean isIrisShaderPackInUse() {
-        if (!irisApiChecked) {
-            irisApiChecked = true;
-            try {
-                Class<?> irisApi = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
-                irisGetInstance = irisApi.getMethod("getInstance");
-                irisShaderPackInUse = irisApi.getMethod("isShaderPackInUse");
-            } catch (ReflectiveOperationException ignored) {
-                irisGetInstance = null;
-                irisShaderPackInUse = null;
-            }
-        }
-        if (irisGetInstance == null || irisShaderPackInUse == null) return false;
-        try {
-            return Boolean.TRUE.equals(irisShaderPackInUse.invoke(irisGetInstance.invoke(null)));
-        } catch (ReflectiveOperationException ignored) {
-            return false;
-        }
-    }
-
     private static HighlightAlpha getHighlightAlpha() {
         float progress = Mth.clamp(ticksSinceSearch / (float) HIGHLIGHT_LIFETIME_TICKS, 0.0F, 1.0F);
         float fade = progress <= 0.6F ? 1.0F : 1.0F - (progress - 0.6F) / 0.4F;
@@ -194,21 +131,6 @@ public final class Rendering {
                 (int) (70.0F * fade * (0.65F + pulse * 0.35F)),
                 (int) (235.0F * fade)
         );
-    }
-
-    private static void emitImmediateBox(PoseStack poseStack, Vec3 cameraPos, BlockPos pos,
-                                         VertexConsumer fillConsumer, VertexConsumer lineConsumer,
-                                         int fillAlpha, int lineAlpha) {
-        poseStack.pushPose();
-        poseStack.translate(
-                pos.getX() + 0.5D - cameraPos.x,
-                pos.getY() + 0.5D - cameraPos.y,
-                pos.getZ() + 0.5D - cameraPos.z
-        );
-        poseStack.scale(BOX_SCALE * 0.5F, BOX_SCALE * 0.5F, BOX_SCALE * 0.5F);
-        if (fillConsumer != null) emitFilledCube(fillConsumer, poseStack.last().pose(), fillAlpha);
-        if (lineConsumer != null) emitCubeOutline(lineConsumer, poseStack.last(), lineAlpha);
-        poseStack.popPose();
     }
 
     private record HighlightAlpha(int fill, int line) {}

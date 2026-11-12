@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '2.0.144'
+    id 'net.neoforged.moddev' version '2.0.148'
     id 'idea'
 }
 
@@ -53,7 +53,7 @@ base {
     archivesName = mod_id
 }
 
-// Mojang ships Java 25 to end users in 26.1.2, so mods should target Java 25.
+// Mojang ships Java 25 to end users in 26.3, so mods should target Java 25.
 java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 neoForge {
@@ -129,8 +129,8 @@ configurations {
 }
 
 dependencies {
-    implementation "dev.isxander:yet-another-config-lib:3.9.1+26.1-neoforge"
-    localRuntime "dev.isxander:yet-another-config-lib:3.9.1+26.1-neoforge"
+    implementation "dev.isxander:yet-another-config-lib:3.9.7+26.3-neoforge"
+    localRuntime "dev.isxander:yet-another-config-lib:3.9.7+26.3-neoforge"
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
     // compileOnly "mezz.jei:jei-${mc_version}-common-api:${jei_version}"

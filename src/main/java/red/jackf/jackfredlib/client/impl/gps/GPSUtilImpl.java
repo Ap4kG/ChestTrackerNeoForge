@@ -13,7 +13,7 @@ import net.minecraft.world.scores.Scoreboard;
 import org.jetbrains.annotations.Nullable;
 import red.jackf.jackfredlib.client.api.gps.PlayerListSnapshot;
 import red.jackf.jackfredlib.client.api.gps.ScoreboardSnapshot;
-import red.jackf.jackfredlib.client.mixins.gps.GuiAccessor;
+import red.jackf.jackfredlib.client.mixins.gps.HudAccessor;
 import red.jackf.jackfredlib.client.mixins.gps.PlayerTabOverlayAccessor;
 
 import java.util.List;
@@ -21,8 +21,8 @@ import java.util.Optional;
 
 public class GPSUtilImpl {
     public static PlayerListSnapshot getPlayerList() {
-        PlayerTabOverlay tabList = Minecraft.getInstance().gui.getTabList();
-        PlayerTabOverlayAccessor accessed = (PlayerTabOverlayAccessor) Minecraft.getInstance().gui.getTabList();
+        PlayerTabOverlay tabList = Minecraft.getInstance().gui.hud.getTabList();
+        PlayerTabOverlayAccessor accessed = (PlayerTabOverlayAccessor) Minecraft.getInstance().gui.hud.getTabList();
         Optional<Component> header = Optional.ofNullable(accessed.jflib$getHeader());
         Optional<Component> footer = Optional.ofNullable(accessed.jflib$getFooter());
         List<Component> names = accessed.jflib$getPlayerInfos().stream()
@@ -39,7 +39,7 @@ public class GPSUtilImpl {
 
         var list = obj.getScoreboard().listPlayerScores(obj).stream()
                       .filter(entry -> !entry.isHidden())
-                      .sorted(GuiAccessor.getScoreDisplayOrder())
+                      .sorted(HudAccessor.getScoreDisplayOrder())
                       .limit(15)
                       .map(entry -> {
                           PlayerTeam playerTeam = scoreboard.getPlayersTeam(entry.owner());
@@ -59,7 +59,7 @@ public class GPSUtilImpl {
         Objective obj = null;
         var playerTeam = scoreboard.getPlayerTeam(mc.player.getScoreboardName());
         if (playerTeam != null) {
-            var displaySlot = DisplaySlot.teamColorToSlot(playerTeam.getColor());
+            var displaySlot = playerTeam.getColor().map(net.minecraft.world.scores.TeamColor::displaySlot).orElse(null);
             if (displaySlot != null) obj = scoreboard.getDisplayObjective(displaySlot);
         }
         if (obj == null) obj = scoreboard.getDisplayObjective(DisplaySlot.SIDEBAR);

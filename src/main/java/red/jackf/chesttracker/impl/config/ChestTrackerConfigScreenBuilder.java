@@ -61,8 +61,8 @@ public class ChestTrackerConfigScreenBuilder {
     }
 
     private static void refreshConfigScreen(Screen parent) {
-        if (Minecraft.getInstance().screen instanceof YACLScreen yacl1) {
-            Minecraft.getInstance().setScreen(build(parent));
+        if (Minecraft.getInstance().gui.screen() instanceof YACLScreen yacl1) {
+            Minecraft.getInstance().gui.setScreen(build(parent));
         }
     }
 
@@ -324,7 +324,7 @@ public class ChestTrackerConfigScreenBuilder {
                         .name(translatable("chesttracker.config.whereisit"))
                         .description(OptionDescription.of(translatable("chesttracker.config.whereisit.description")))
                         .text(translatable("chesttracker.gui.open"))
-                        .action((yaclScreen, button) -> Minecraft.getInstance().setScreen(WhereIsItConfigScreenBuilder.build(yaclScreen))).build())
+                        .action((yaclScreen, button) -> Minecraft.getInstance().gui.setScreen(WhereIsItConfigScreenBuilder.build(yaclScreen))).build())
                 .build();
     }
 
@@ -358,10 +358,10 @@ public class ChestTrackerConfigScreenBuilder {
                         .text(translatable("chesttracker.config.open"))
                         .action(((screen, option) -> {
                             Runnable lambda = () -> {
-                                Minecraft.getInstance().setScreen(screen);
+                                Minecraft.getInstance().gui.setScreen(screen);
                                 refreshConfigScreen(parent);
                             };
-                            Minecraft.getInstance().setScreen(new MemoryBankManagerScreen(lambda, lambda));
+                            Minecraft.getInstance().gui.setScreen(new MemoryBankManagerScreen(lambda, lambda));
                         }))
                         .build());*/
 
@@ -376,7 +376,7 @@ public class ChestTrackerConfigScreenBuilder {
                 .name(translatable("chesttracker.config.storage"))
                 .option(ButtonOption.createBuilder()
                         .name(translatable("chesttracker.config.storage.openFolder"))
-                        .action((screen, button) -> Util.getPlatform().openUri(Constants.STORAGE_DIR.toUri()))
+                        .action((screen, button) -> com.mojang.blaze3d.Blaze3D.openUri(Constants.STORAGE_DIR.toUri()))
                         .text(literal(getDirectorySizeString()))
                         .build())
                 .option(Option.<Backend.Type>createBuilder()
@@ -591,7 +591,7 @@ public class ChestTrackerConfigScreenBuilder {
                     }).build());
         }
 
-        Minecraft.getInstance().setScreen(YetAnotherConfigLib.createBuilder()
+        Minecraft.getInstance().gui.setScreen(YetAnotherConfigLib.createBuilder()
                 .title(translatable("chesttracker.config.inventoryButton.manageCustom"))
                 .category(category.build())
                 .build()
