@@ -36,7 +36,7 @@ jobs:
           tag_name: v3.0.0+26.3
           target_commitish: ${{ github.sha }}
           name: Chest Tracker 3.0.0 — NeoForge 26.3
-          prerelease: true
+          prerelease: false
           generate_release_notes: false
           body_path: CHANGELOG.md
           files: build/libs/chesttracker-3.0.0+26.3.jar
