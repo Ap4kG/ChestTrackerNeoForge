@@ -8,6 +8,8 @@ import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
@@ -16,6 +18,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import red.jackf.chesttracker.api.ChestTrackerPlugin;
+import red.jackf.chesttracker.impl.compat.mods.shulkerboxtooltip.ShulkerBoxTooltipIntegration;
 import red.jackf.chesttracker.impl.config.ChestTrackerConfig;
 import red.jackf.chesttracker.impl.gui.DeveloperOverlay;
 import red.jackf.chesttracker.impl.gui.invbutton.ButtonPositionMap;
@@ -43,7 +46,9 @@ public class ChestTracker {
             new KeyMapping.Category(Identifier.fromNamespaceAndPath(ID, "title"));
     private static boolean shouldSkipProviderForNextGuiClose = false;
 
-    public ChestTracker(IEventBus modEventBus) {
+    public ChestTracker(IEventBus modEventBus, ModContainer modContainer) {
+        if (ModList.get().isLoaded("shulkerboxtooltip"))
+            ShulkerBoxTooltipIntegration.register(modContainer);
         modEventBus.addListener(this::onClientSetup);
         modEventBus.addListener(this::onRegisterReloadListeners);
         modEventBus.addListener(ChestTracker::registerKeyMappings);
