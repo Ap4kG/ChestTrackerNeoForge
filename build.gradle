@@ -29,9 +29,7 @@ sourceSets.main.resources {
 
 sourceSets.main.java {
     exclude 'red/jackf/chesttracker/impl/compat/mods/ChestTrackerModMenu.java'
-    exclude 'red/jackf/chesttracker/impl/compat/mods/jade/**'
     exclude 'red/jackf/chesttracker/impl/compat/mods/litematica/**'
-    exclude 'red/jackf/chesttracker/impl/compat/mods/shulkerboxtooltip/**'
     exclude 'red/jackf/chesttracker/impl/compat/mods/wthit/**'
     exclude 'red/jackf/chesttracker/impl/compat/mods/searchables/CustomSearchablesFormatter.java'
     exclude 'red/jackf/chesttracker/impl/gui/invbutton/ui/BlockLabelButton.java'
@@ -131,6 +129,12 @@ configurations {
 dependencies {
     implementation "dev.isxander:yet-another-config-lib:3.9.7+26.3-neoforge"
     localRuntime "dev.isxander:yet-another-config-lib:3.9.7+26.3-neoforge"
+
+    // Optional integrations. Compiled against the production jars in ./libs (NeoForge ships official Mojang
+    // mappings), and loaded as local runtimes so the dev client can test them.
+    compileOnly fileTree(dir: 'libs', include: ['*.jar'])
+    localRuntime fileTree(dir: 'libs', include: ['*.jar'])
+
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
     // compileOnly "mezz.jei:jei-${mc_version}-common-api:${jei_version}"

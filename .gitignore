@@ -38,3 +38,6 @@ run/
 **/src/generated/**/.cache/
 repo/
 !**/src/**/repo/
+
+### Optional integration jars (compile-time only, see README) ###
+/libs/

@@ -11,6 +11,20 @@ Unofficial NeoForge port of [Chest Tracker](https://github.com/ponuing/ChestTrac
 
 ## Build
 
+The optional integrations are compiled against the production mod jars, which are not vendored in this
+repository. Drop them into a `libs/` folder in the project root before building:
+
+| Mod | Jar |
+|---|---|
+| Jade | `Jade-mc26.3-NeoForge-26.3.5.jar` |
+| JEI | `jei-26.3-neoforge-31.17.0.109.jar` |
+| Shulker Box Tooltip | `shulkerboxtooltip-neoforge-5.4.3+26.3.jar` |
+| Xaero's Minimap | `xaerominimap-neoforge-26.3-26.6.2.jar` |
+| Xaero's World Map | `xaeroworldmap-neoforge-26.3-1.47.2.jar` |
+
+`libs/` is git-ignored; the jars are used for compilation (`compileOnly`) and for the dev client
+(`localRuntime`) only. Nothing from them is shaded into the output.
+
 ```shell
 ./gradlew build
 ```
@@ -19,7 +33,14 @@ The built JAR is written to `build/libs/`.
 
 ## Port status
 
-Core container memory, storage, search, inventory controls, configuration and world highlights are ported. World labels are currently disabled. Optional Litematica, Jade, WTHIT, ShulkerBoxTooltip and Searchables integrations are not included in this build.
+Core container memory, storage, search, inventory controls, configuration and world highlights are ported. World labels are currently disabled. Litematica, WTHIT and Searchables integrations are not included in this build.
+
+Optional integrations with Jade, Shulker Box Tooltip, JEI and Xaero's Minimap/World Map are included and can be toggled individually in the config screen under Compatibility:
+
+- **Jade** — remembered container contents in the tooltip.
+- **Shulker Box Tooltip** — client-side ender chest preview built from the Memory Bank.
+- **JEI** — press the search key on a hovered ingredient (ingredient list, bookmarks, recipe slots).
+- **Xaero's Minimap / World Map** — search results become temporary waypoints labelled with the amount and item name.
 
 Press `T` while hovering an item in any inventory to find matching saved containers. The inventory closes only when a match exists. This key can be changed in Minecraft's Controls settings.
 
