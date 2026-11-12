@@ -14,13 +14,15 @@ import java.util.Set;
 public final class SearchResult {
     private final BlockPos pos;
     private final @Nullable ItemStack item;
+    private final int count;
     private final @Nullable Component name;
     private final @Nullable Vec3 nameOffset;
     private final Set<BlockPos> otherPositions;
 
-    private SearchResult(BlockPos pos, @Nullable ItemStack item, @Nullable Component name, @Nullable Vec3 nameOffset, Collection<BlockPos> otherPositions) {
+    private SearchResult(BlockPos pos, @Nullable ItemStack item, int count, @Nullable Component name, @Nullable Vec3 nameOffset, Collection<BlockPos> otherPositions) {
         this.pos = pos.immutable();
         this.item = item == null ? null : item.copy();
+        this.count = count > 0 ? count : (item == null ? 0 : item.getCount());
         this.name = name;
         this.nameOffset = nameOffset;
         this.otherPositions = new HashSet<>(otherPositions);
@@ -37,6 +39,13 @@ public final class SearchResult {
 
     public @Nullable ItemStack item() {
         return item;
+    }
+
+    /**
+     * Total amount of the searched item in this container, summed over every matching stack.
+     */
+    public int count() {
+        return count;
     }
 
     public @Nullable Component name() {
@@ -58,6 +67,7 @@ public final class SearchResult {
     public static final class Builder {
         private final BlockPos pos;
         private @Nullable ItemStack item;
+        private int count;
         private @Nullable Component name;
         private @Nullable Vec3 nameOffset;
         private final Set<BlockPos> otherPositions = new HashSet<>();
@@ -68,6 +78,11 @@ public final class SearchResult {
 
         public Builder item(ItemStack item) {
             this.item = item;
+            return this;
+        }
+
+        public Builder count(int count) {
+            this.count = count;
             return this;
         }
 
@@ -88,7 +103,7 @@ public final class SearchResult {
         }
 
         public SearchResult build() {
-            return new SearchResult(pos, item, name, nameOffset, otherPositions);
+            return new SearchResult(pos, item, count, name, nameOffset, otherPositions);
         }
     }
 

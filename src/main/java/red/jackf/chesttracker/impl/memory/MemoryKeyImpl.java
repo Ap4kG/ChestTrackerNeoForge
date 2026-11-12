@@ -269,8 +269,14 @@ public class MemoryKeyImpl implements MemoryKey {
                     .findFirst();
             if (matchingItem.isEmpty()) continue;
 
+            int matchingCount = entry.getValue().items().stream()
+                    .filter(stack -> ItemStack.isSameItemSameComponents(stack, matchingItem.get()))
+                    .mapToInt(ItemStack::getCount)
+                    .sum();
+
             SearchResult.Builder result = SearchResult.builder(resultPos)
                     .item(matchingItem.get())
+                    .count(matchingCount)
                     .otherPositions(entry.getValue().otherPositions());
 
             if (entityId != null && liveEntityId != null) {

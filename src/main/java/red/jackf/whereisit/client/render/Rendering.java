@@ -15,6 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 import net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent;
@@ -23,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joml.Matrix4f;
 import red.jackf.chesttracker.impl.ChestTracker;
+import red.jackf.chesttracker.impl.compat.mods.xaero.XaeroIntegration;
 import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.SearchResult;
 
@@ -106,6 +108,7 @@ public final class Rendering {
             RESULTS.put(result.pos(), result);
             if (result.name() != null) NAMED_RESULTS.put(result.pos(), result);
         }
+        if (ModList.get().isLoaded(XaeroIntegration.MOD_ID)) XaeroIntegration.onResultsAdded(results);
     }
 
     public static void setLastRequest(SearchRequest request) {}
@@ -113,6 +116,7 @@ public final class Rendering {
     public static void clearResults() {
         RESULTS.clear();
         NAMED_RESULTS.clear();
+        if (ModList.get().isLoaded(XaeroIntegration.MOD_ID)) XaeroIntegration.clearWaypoints();
     }
 
     public static void resetSearchTime() {
