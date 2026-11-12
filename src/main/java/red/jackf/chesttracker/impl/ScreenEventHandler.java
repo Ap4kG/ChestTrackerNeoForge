@@ -5,10 +5,13 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import red.jackf.chesttracker.api.gui.ScreenBlacklist;
+import red.jackf.chesttracker.impl.compat.mods.jei.JeiIntegration;
 import red.jackf.chesttracker.impl.config.ChestTrackerConfig;
 import red.jackf.chesttracker.impl.gui.invbutton.CTButtonScreenDuck;
 import red.jackf.chesttracker.impl.gui.invbutton.InventoryButtonFeature;
@@ -75,15 +78,26 @@ public final class ScreenEventHandler {
     public static void onScreenKeyPressedPre(ScreenEvent.KeyPressed.Pre event) {
         Screen screen = event.getScreen();
         Minecraft client = Minecraft.getInstance();
-        if (client.level == null || !(screen instanceof AbstractContainerScreen<?> containerScreen)) return;
+        if (client.level == null) return;
         if (ShouldIgnoreKey.EVENT.invoker().shouldIgnoreKey()) return;
         if (ChestTracker.SEARCH_HOVERED_ITEM == null || !ChestTracker.SEARCH_HOVERED_ITEM.matches(event.getKeyEvent())) return;
 
-        var hoveredSlot = ((CTButtonScreenDuck) containerScreen).chesttracker$getHoveredSlot();
-        if (hoveredSlot == null || !hoveredSlot.hasItem()) return;
+        ItemStack target = ItemStack.EMPTY;
+
+        if (screen instanceof AbstractContainerScreen<?> containerScreen) {
+            var hoveredSlot = ((CTButtonScreenDuck) containerScreen).chesttracker$getHoveredSlot();
+            if (hoveredSlot != null && hoveredSlot.hasItem()) target = hoveredSlot.getItem();
+        }
+
+        // Nothing in the container under the cursor - fall back to JEI, which also covers its recipe screen
+        // and the ingredient list overlay drawn over other menus.
+        if (target.isEmpty() && ModList.get().isLoaded(JeiIntegration.MOD_ID))
+            target = JeiIntegration.getHoveredItem(screen).orElse(ItemStack.EMPTY);
+
+        if (target.isEmpty()) return;
 
         SearchRequest request = new SearchRequest();
-        SearchRequestPopulator.addItemStack(request, hoveredSlot.getItem(), SearchRequestPopulator.Context.INVENTORY_PRECISE);
+        SearchRequestPopulator.addItemStack(request, target, SearchRequestPopulator.Context.RECIPE);
         SearchInvoker.doSearchIfFound(request);
         event.setCanceled(true);
     }
