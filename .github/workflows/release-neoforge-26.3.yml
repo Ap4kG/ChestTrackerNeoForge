@@ -33,27 +33,10 @@ jobs:
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v2.8.3_0.4+26.3
+          tag_name: v3.0.0+26.3
           target_commitish: ${{ github.sha }}
-          name: Chest Tracker 2.8.3_0.4 — NeoForge 26.3
+          name: Chest Tracker 3.0.0 — NeoForge 26.3
           prerelease: true
           generate_release_notes: false
-          body: |
-            Unofficial NeoForge port of Chest Tracker for Minecraft 26.3.
-
-            Requirements:
-            - Minecraft 26.3
-            - NeoForge 26.3.0.102 or newer
-            - YACL 3.9.7+26.3 for NeoForge
-
-            ## 26.3 port
-
-            - Added a separate **Enhanced Cleanup** setting.
-            - Enhanced Cleanup checks remembered containers in loaded chunks before searches and when opening Chest Tracker.
-            - Missing or broken containers found by Enhanced Cleanup are removed from the local database.
-            - The original **Periodic Check** remains available as an independent setting.
-            - Added shader-compatible 3D container highlights for Iris and shader packs such as Complementary Unbound.
-            - Shader highlights use the same pulsing, fading, see-through boxes as the standard renderer.
-
-            World labels and optional Litematica, Jade, WTHIT, ShulkerBoxTooltip and Searchables integrations are currently disabled.
-          files: build/libs/chesttracker-2.8.3_0.4+26.3.jar
+          body_path: CHANGELOG.md
+          files: build/libs/chesttracker-3.0.0+26.3.jar
