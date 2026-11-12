@@ -130,8 +130,9 @@ dependencies {
     implementation "dev.isxander:yet-another-config-lib:3.9.7+26.3-neoforge"
     localRuntime "dev.isxander:yet-another-config-lib:3.9.7+26.3-neoforge"
 
-    // Optional integrations. Compiled against the production jars in ./libs (NeoForge ships official Mojang
-    // mappings), and loaded as local runtimes so the dev client can test them.
+    // Optional integrations. The production jars are fetched by downloadIntegrationJars (see the end of this
+    // file) into ./libs, compiled against via compileOnly, and loaded as local runtimes so the dev client can
+    // test them. Nothing from them is shaded into the output.
     compileOnly fileTree(dir: 'libs', include: ['*.jar'])
     localRuntime fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -207,3 +208,62 @@ idea {
         downloadJavadoc = true
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------
+// Optional integration jars
+//
+// Third-party jars are not committed, so both a fresh clone and CI pull them straight from Modrinth's CDN.
+// Maps jar name -> [sha1, download url]; the checksum is what pins the exact artifact.
+// ---------------------------------------------------------------------------------------------------------------
+def integrationJars = [
+        'Jade-mc26.3-NeoForge-26.3.5.jar'          : ['add5199928930724adbe6f9dfaaf646bd1027294',
+            'https://cdn.modrinth.com/data/nvQzSEkH/versions/dVB8U7Td/Jade-mc26.3-NeoForge-26.3.5.jar'],
+        'jei-26.3-neoforge-31.17.0.109.jar'        : ['1b94e7a5d33587855a24d869214407a607953801',
+            'https://cdn.modrinth.com/data/u6dRKJwZ/versions/TAqAED7H/jei-26.3-neoforge-31.17.0.109.jar'],
+        'shulkerboxtooltip-neoforge-5.4.3+26.3.jar': ['cf1bba312b46395401118ab2742e722b66946a1e',
+            'https://cdn.modrinth.com/data/2M01OLQq/versions/mt6otkUC/shulkerboxtooltip-neoforge-5.4.3%2B26.3.jar'],
+        'xaerominimap-neoforge-26.3-26.6.2.jar'    : ['4972839ac5bd327336792fc407296f0d28e62c9c',
+            'https://cdn.modrinth.com/data/1bokaNcj/versions/fibBhMQW/xaerominimap-neoforge-26.3-26.6.2.jar'],
+        'xaeroworldmap-neoforge-26.3-1.47.2.jar'   : ['31c8825cab057953f27c8097922b6652fc2b2f23',
+            'https://cdn.modrinth.com/data/NcUtCpym/versions/KeQTErHb/xaeroworldmap-neoforge-26.3-1.47.2.jar'],
+]
+
+def integrationJarsDir = layout.projectDirectory.dir('libs').asFile
+
+tasks.register('downloadIntegrationJars') {
+    group = 'build setup'
+    description = 'Fetches the optional integration jars (Jade, JEI, Shulker Box Tooltip, Xaero) used for compilation.'
+
+    def targetDir = integrationJarsDir
+    def jars = integrationJars
+    outputs.files(jars.keySet().collect { new File(targetDir, it) })
+
+    doLast {
+        targetDir.mkdirs()
+        def sha1 = { File file ->
+            java.security.MessageDigest.getInstance('SHA-1').digest(file.bytes).encodeHex().toString()
+        }
+        def client = java.net.http.HttpClient.newBuilder()
+                .followRedirects(java.net.http.HttpClient.Redirect.NORMAL)
+                .build()
+        jars.each { name, spec ->
+            def expected = spec[0]
+            def target = new File(targetDir, name)
+            if (target.isFile() && sha1(target) == expected) return
+            logger.lifecycle("Downloading ${name}")
+            def request = java.net.http.HttpRequest.newBuilder(java.net.URI.create(spec[1])).GET().build()
+            def response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofByteArray())
+            if (response.statusCode() != 200)
+                throw new GradleException("Could not download ${name}: HTTP ${response.statusCode()}")
+            target.bytes = response.body()
+            def actual = sha1(target)
+            if (actual != expected)
+                throw new GradleException("Checksum mismatch for ${name}: expected ${expected}, got ${actual}")
+        }
+    }
+}
+
+tasks.named('compileJava').configure {
+    dependsOn 'downloadIntegrationJars'
+}
+

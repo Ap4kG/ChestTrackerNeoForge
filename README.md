@@ -11,8 +11,15 @@ Unofficial NeoForge port of [Chest Tracker](https://github.com/ponuing/ChestTrac
 
 ## Build
 
-The optional integrations are compiled against the production mod jars, which are not vendored in this
-repository. Drop them into a `libs/` folder in the project root before building:
+```shell
+./gradlew build
+```
+
+The built JAR is written to `build/libs/`.
+
+The optional integrations are compiled against the production mod jars, which are not committed. Gradle
+downloads them from Modrinth into `libs/` on the first build (task `downloadIntegrationJars`, checksums
+pinned in `build.gradle`):
 
 | Mod | Jar |
 |---|---|
@@ -22,14 +29,8 @@ repository. Drop them into a `libs/` folder in the project root before building:
 | Xaero's Minimap | `xaerominimap-neoforge-26.3-26.6.2.jar` |
 | Xaero's World Map | `xaeroworldmap-neoforge-26.3-1.47.2.jar` |
 
-`libs/` is git-ignored; the jars are used for compilation (`compileOnly`) and for the dev client
-(`localRuntime`) only. Nothing from them is shaded into the output.
-
-```shell
-./gradlew build
-```
-
-The built JAR is written to `build/libs/`.
+`libs/` is git-ignored. The jars are used for compilation (`compileOnly`) and for the dev client
+(`localRuntime`) only; nothing from them is shaded into the output.
 
 ## Port status
 
