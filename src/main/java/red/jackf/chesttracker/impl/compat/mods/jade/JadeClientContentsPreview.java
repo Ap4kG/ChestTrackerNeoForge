@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.AbstractFurnaceBlock;
 import red.jackf.chesttracker.api.memory.Memory;
 import red.jackf.chesttracker.api.memory.MemoryBankAccess;
 import red.jackf.chesttracker.impl.ChestTracker;
+import red.jackf.chesttracker.impl.config.ChestTrackerConfig;
 import red.jackf.chesttracker.impl.util.ItemStacks;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
@@ -67,6 +68,7 @@ public class JadeClientContentsPreview implements IBlockComponentProvider {
 
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
+        if (!ChestTrackerConfig.INSTANCE.instance().compatibility.jadeIntegration) return;
         MemoryBankAccess.INSTANCE.getLoaded().ifPresent(bank -> {
             Optional<Memory> memory = bank.getMemory(accessor.getLevel(), accessor.getPosition());
             if (memory.isEmpty()) return;
