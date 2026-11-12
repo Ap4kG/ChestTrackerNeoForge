@@ -1,6 +1,8 @@
 package red.jackf.whereisit.client.render;
 
 import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.ColorTargetState;
+import com.mojang.renderpearl.api.pipeline.BlendFunction;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
@@ -32,10 +34,12 @@ import java.util.Optional;
 public final class Rendering {
     private static final RenderPipeline HIGHLIGHT_FILL_PIPELINE = RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
             .withLocation(ChestTracker.id("pipeline/highlight_fill_see_through"))
+            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
             .withDepthStencilState(Optional.empty())
             .build();
     private static final RenderPipeline HIGHLIGHT_LINE_PIPELINE = RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
             .withLocation(ChestTracker.id("pipeline/highlight_line_see_through"))
+            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
             .withDepthStencilState(Optional.empty())
             .build();
     private static final RenderType HIGHLIGHT_FILL = RenderType.create(
